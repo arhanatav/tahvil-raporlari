@@ -42,7 +42,7 @@ function ayEkle(iso,a){const d=new Date(iso+'T12:00:00');d.setMonth(d.getMonth()
 function hedef(k){
   if(k==='onceki')return enYakinOnceki(tarihEkle(BUGUN,-1),5);
   if(k==='hafta')return enYakinOnceki(tarihEkle(BUGUN,-7),10);
-  if(k==='ay')return enYakinOnceki(ayEkle(BUGUN,1),10);
+  if(k==='ay')return enYakinOnceki(ayEkle(BUGUN,1));
   return null;
 }
 const aktif=[];
