@@ -11,7 +11,6 @@ h1{font-size:22px;font-weight:600}
 .ozelnot{color:#b06000;font-size:12.5px;margin:0 0 8px}
 .box{height:460px;position:relative}
 table{border-collapse:collapse;width:100%;margin-top:40px;font-size:12.5px}
-tr.ortalama-satir td{border-top:2px solid #999;font-weight:600}
 th,td{border-bottom:1px solid #e5e5e5;padding:6px 8px;text-align:right;white-space:nowrap}
 th:first-child,td:first-child{text-align:left} th{color:#666;font-weight:600}</style></head><body>
 <h1>Altına Dayalı Hazine Kağıtları — Fiyat</h1>
@@ -67,29 +66,26 @@ function ciz(){
   if(grafik)grafik.destroy();
   grafik=new Chart(document.getElementById('c1'),{type:'line',data:{datasets:d},options:OPT});
 }
+function ortalamaFiyat(p){
+  const h0=p.h0||0, h1=p.h1||0;
+  if(p.y!=null&&p.f1!=null&&(h0+h1)>0)return (p.y*h0+p.f1*h1)/(h0+h1);
+  return p.y!=null?p.y:p.f1;
+}
 function tablo(){
   document.getElementById('thr').innerHTML='<th>ISIN</th><th>Tür</th><th>Vade (yıl)</th><th>T+0 fiyat '+BUGUN+'</th>'+
     aktif.map(a=>'<th>'+a.ad+'<br>'+a.tarih+' (Δ)</th>').join('')+
-    '<th>T+1 fiyat</th><th>Hacim T+0 (TL)</th><th>Hacim T+1 (TL)</th>';
+    '<th>T+1 fiyat</th><th>Ortalama Fiyat</th><th>Hacim T+0 (TL)</th><th>Hacim T+1 (TL)</th>';
   const maps=aktif.map(a=>{const m={};arsiv[a.tarih].forEach(p=>m[p.isin]=p);return m;});
   document.getElementById('tb').innerHTML=bugun.map(p=>{
     const huc=maps.map(m=>{const o=m[p.isin];if(!o||o.y==null||p.y==null)return '<td>-</td>';
       const f=p.y-o.y;
       return '<td>'+o.y.toLocaleString('tr-TR')+' ('+(f>=0?'+':'−')+Math.abs(f).toLocaleString('tr-TR')+')</td>';}).join('');
+    const ort=ortalamaFiyat(p);
     return '<tr><td>'+p.isin+'</td><td>'+p.tur+'</td><td>'+p.x.toFixed(2)+'</td>'+
       '<td><b>'+(p.y!=null?p.y.toLocaleString('tr-TR'):'-')+'</b></td>'+huc+
-      '<td>'+(p.f1!=null?p.f1.toLocaleString('tr-TR'):'-')+'</td><td>'+mn(p.h0)+'</td><td>'+mn(p.h1)+'</td></tr>';
-  }).join('')+ortalamaSatirlari();
-}
-function ortalamaSatirlari(){
-  const gruplar={};
-  bugun.forEach(p=>{if(p.y==null)return;(gruplar[p.tur]=gruplar[p.tur]||[]).push(p.y);});
-  const boskol=aktif.length+3;
-  return Object.keys(gruplar).sort().map(tur=>{
-    const v=gruplar[tur], ort=v.reduce((a,b)=>a+b,0)/v.length;
-    return '<tr class="ortalama-satir"><td colspan="2">Ortalama — '+tur+' ('+v.length+' kağıt)</td><td>-</td>'+
-      '<td>'+ort.toLocaleString('tr-TR',{maximumFractionDigits:2})+'</td>'+
-      '<td>-</td>'.repeat(boskol)+'</tr>';
+      '<td>'+(p.f1!=null?p.f1.toLocaleString('tr-TR'):'-')+'</td>'+
+      '<td><b>'+(ort!=null?ort.toLocaleString('tr-TR',{maximumFractionDigits:2}):'-')+'</b></td>'+
+      '<td>'+mn(p.h0)+'</td><td>'+mn(p.h1)+'</td></tr>';
   }).join('');
 }
 function guncelle(){ciz();tablo();}
