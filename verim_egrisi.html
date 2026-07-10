@@ -33,15 +33,21 @@ const tarihler=Object.keys(arsiv).sort();
 const sel=document.getElementById('tarihsec');
 [...tarihler].reverse().forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;sel.appendChild(o);});
 
-function enYakinOnceki(hedef){let s=null;for(const t of tarihler){if(t<=hedef)s=t;else break;}return s;}
+function gunFarki(a,b){return Math.abs((new Date(a+'T12:00:00')-new Date(b+'T12:00:00'))/86400000);}
+function enYakinOnceki(hedef,tolerans){
+  let en=null, enFark=Infinity;
+  for(const t of tarihler){const fark=gunFarki(t,hedef);if(fark<enFark){en=t;enFark=fark;}}
+  if(en!=null&&tolerans!=null&&enFark>tolerans)return null;
+  return en;
+}
 function tarihEkle(iso,g){const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+g);return d.toISOString().slice(0,10);}
 function ayEkle(iso,a){const d=new Date(iso+'T12:00:00');d.setMonth(d.getMonth()-a);return d.toISOString().slice(0,10);}
 function hedef(k){
-  if(k==='onceki')return enYakinOnceki(tarihEkle(BUGUN,-1));
-  if(k==='hafta')return enYakinOnceki(tarihEkle(BUGUN,-7));
-  if(k==='ay')return enYakinOnceki(ayEkle(BUGUN,1));
-  if(k==='aralik')return enYakinOnceki((+BUGUN.slice(0,4)-1)+'-12-31');
-  if(k==='subat'){let y=+BUGUN.slice(0,4);let h=y+'-02-27';if(h>BUGUN)h=(y-1)+'-02-27';return enYakinOnceki(h);}
+  if(k==='onceki')return enYakinOnceki(tarihEkle(BUGUN,-1),5);
+  if(k==='hafta')return enYakinOnceki(tarihEkle(BUGUN,-7),10);
+  if(k==='ay')return enYakinOnceki(ayEkle(BUGUN,1),10);
+  if(k==='aralik')return enYakinOnceki((+BUGUN.slice(0,4)-1)+'-12-31',20);
+  if(k==='subat'){let y=+BUGUN.slice(0,4);let h=y+'-02-27';if(h>BUGUN)h=(y-1)+'-02-27';return enYakinOnceki(h,20);}
   return null;
 }
 const aktif=[];   // {ad, tarih, renk}

@@ -34,9 +34,10 @@ const sel=document.getElementById('tarihsec');
 
 function gunFarki(a,b){return Math.abs((new Date(a+'T12:00:00')-new Date(b+'T12:00:00'))/86400000);}
 function enYakinOnceki(hedef,tolerans){
-  let s=null;for(const t of tarihler){if(t<=hedef)s=t;else break;}
-  if(s!=null&&gunFarki(s,hedef)>tolerans)return null;
-  return s;
+  let en=null, enFark=Infinity;
+  for(const t of tarihler){const fark=gunFarki(t,hedef);if(fark<enFark){en=t;enFark=fark;}}
+  if(en!=null&&tolerans!=null&&enFark>tolerans)return null;
+  return en;
 }
 function tarihEkle(iso,g){const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+g);return d.toISOString().slice(0,10);}
 function ayEkle(iso,a){const d=new Date(iso+'T12:00:00');d.setMonth(d.getMonth()-a);return d.toISOString().slice(0,10);}
