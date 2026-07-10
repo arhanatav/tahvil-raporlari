@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8">
+<title>Altına Dayalı Hazine Kağıtları — Fiyat — 2026-07-09</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;max-width:1060px;margin:36px auto;padding:0 20px;color:#222}
+h1{font-size:22px;font-weight:600}
+.sub{color:#666;font-size:14px;margin-bottom:12px}
+.sec{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 8px;font-size:13px}
+.sec button{border:2px solid #ccc;background:#f7f7f7;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:13px}
+.sec button.aktif{color:#fff} .sec select{padding:5px;border-radius:6px;border:1px solid #ccc;font-size:13px}
+.not{color:#888;font-size:12px;margin:0 0 8px} #uyari{color:#b00;font-size:12.5px;margin:0 0 8px;display:none}
+.ozelnot{color:#b06000;font-size:12.5px;margin:0 0 8px}
+.box{height:460px;position:relative}
+table{border-collapse:collapse;width:100%;margin-top:40px;font-size:12.5px}
+th,td{border-bottom:1px solid #e5e5e5;padding:6px 8px;text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left} th{color:#666;font-weight:600}</style></head><body>
+<h1>Altına Dayalı Hazine Kağıtları — Fiyat</h1>
+<p class="sub">Altın tahvili + altına dayalı kira sertifikası (Hazine, resmi BIST listesi) · KESN pazarı · Grafik: T+0 valör ağırlıklı ort. fiyat, TL (bu kağıtlar neredeyse yalnız T+0 işlem görür; T+1 tabloda) · Mavi çizgi: 2026-07-09</p>
+
+<div class="sec">Karşılaştır (aç/kapa):
+<button data-k="onceki" data-renk="#d63a2a">Önceki gün</button>
+<button data-k="hafta" data-renk="#2a9d4b">1 hafta önce</button>
+<button data-k="ay" data-renk="#0e8f8f">1 ay önce</button>
+<select id="tarihsec"><option value="">+ Arşivden tarih…</option></select>
+</div>
+<p id="uyari"></p>
+<p class="not">Bu kağıtlarda işlem seyrektir; bir günde yalnız birkaç kağıt işlem görebilir. Düğmeler o günün fiyatlarını ekler/çıkarır, tabloya da fark sütunu (Δ) gelir.</p>
+<div class="box"><canvas id="c1"></canvas></div>
+<table><thead><tr id="thr"></tr></thead><tbody id="tb"></tbody></table>
+<script>
+const BUGUN='2026-07-09', bugun=[{"x": 0.553, "y": 6217.5, "f1": null, "isin": "TRD270127T13", "tur": "Kira Sert.", "h0": 742369500.0, "h1": 0.0}], arsiv={"2025-12-31": [{"x": 0.767, "y": 6617.96, "f1": null, "isin": "TRD071026T17", "tur": "Kira Sert.", "h0": 4839879000.0, "h1": 0.0}, {"x": 0.767, "y": 6221.0, "f1": null, "isin": "TRT071026T19", "tur": "Tahvil", "h0": 618989500.0, "h1": 0.0}], "2026-06-30": [{"x": 1.384, "y": 6116.78, "f1": null, "isin": "TRD171127T39", "tur": "Kira Sert.", "h0": 54775745.0, "h1": 0.0}], "2026-07-07": [{"x": 1.115, "y": 6253.0, "f1": null, "isin": "TRD180827T17", "tur": "Kira Sert.", "h0": 31108675.0, "h1": 0.0}, {"x": 1.69, "y": 6280.0, "f1": null, "isin": "TRD150328T14", "tur": "Kira Sert.", "h0": 6248600000.0, "h1": 0.0}]};
+const tarihler=Object.keys(arsiv).sort();
+const sel=document.getElementById('tarihsec');
+[...tarihler].reverse().forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;sel.appendChild(o);});
+
+function enYakinOnceki(hedef){let s=null;for(const t of tarihler){if(t<=hedef)s=t;else break;}return s;}
+function tarihEkle(iso,g){const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+g);return d.toISOString().slice(0,10);}
+function ayEkle(iso,a){const d=new Date(iso+'T12:00:00');d.setMonth(d.getMonth()-a);return d.toISOString().slice(0,10);}
+function hedef(k){
+  if(k==='onceki')return enYakinOnceki(tarihEkle(BUGUN,-1));
+  if(k==='hafta')return enYakinOnceki(tarihEkle(BUGUN,-7));
+  if(k==='ay')return enYakinOnceki(ayEkle(BUGUN,1));
+  return null;
+}
+const aktif=[];
+const mn=x=>x>=1e9?(x/1e9).toLocaleString('tr-TR',{maximumFractionDigits:2})+' mr':
+  (x/1e6).toLocaleString('tr-TR',{maximumFractionDigits:1})+' mn';
+const t0li=pts=>pts.filter(p=>p.y!=null);
+const OPT={responsive:true,maintainAspectRatio:false,parsing:{xAxisKey:'x',yAxisKey:'y'},
+ plugins:{legend:{labels:{usePointStyle:true,pointStyleWidth:24}},
+  tooltip:{callbacks:{title:i=>i[0].raw.isin,
+   label:i=>{const r=i.raw;return i.dataset.label+' ('+r.tur+') — Vade: '+r.x.toFixed(2)+' yıl, Fiyat: '+r.y.toLocaleString('tr-TR')+', Hacim: '+mn((r.h0||0)+(r.h1||0));}}}},
+ scales:{x:{type:'linear',title:{display:true,text:'Vadeye kalan süre (yıl)'},min:0},
+  y:{title:{display:true,text:'Fiyat (TL)'}}}};
+let grafik=null;
+function ciz(){
+  const d=[{label:BUGUN,data:t0li(bugun),borderColor:'#2a78d6',backgroundColor:'#2a78d6',
+    borderWidth:2.5,pointRadius:5,tension:0.35,fill:false,showLine:t0li(bugun).length>1}];
+  aktif.forEach(a=>d.push({label:a.ad+' ('+a.tarih+')',data:t0li(arsiv[a.tarih]),
+    borderColor:a.renk,backgroundColor:a.renk,borderWidth:2,pointRadius:4,tension:0.35,fill:false,
+    showLine:t0li(arsiv[a.tarih]).length>1}));
+  if(grafik)grafik.destroy();
+  grafik=new Chart(document.getElementById('c1'),{type:'line',data:{datasets:d},options:OPT});
+}
+function tablo(){
+  document.getElementById('thr').innerHTML='<th>ISIN</th><th>Tür</th><th>Vade (yıl)</th><th>T+0 fiyat '+BUGUN+'</th>'+
+    aktif.map(a=>'<th>'+a.ad+'<br>'+a.tarih+' (Δ)</th>').join('')+
+    '<th>T+1 fiyat</th><th>Hacim T+0 (TL)</th><th>Hacim T+1 (TL)</th>';
+  const maps=aktif.map(a=>{const m={};arsiv[a.tarih].forEach(p=>m[p.isin]=p);return m;});
+  document.getElementById('tb').innerHTML=bugun.map(p=>{
+    const huc=maps.map(m=>{const o=m[p.isin];if(!o||o.y==null||p.y==null)return '<td>-</td>';
+      const f=p.y-o.y;
+      return '<td>'+o.y.toLocaleString('tr-TR')+' ('+(f>=0?'+':'−')+Math.abs(f).toLocaleString('tr-TR')+')</td>';}).join('');
+    return '<tr><td>'+p.isin+'</td><td>'+p.tur+'</td><td>'+p.x.toFixed(2)+'</td>'+
+      '<td><b>'+(p.y!=null?p.y.toLocaleString('tr-TR'):'-')+'</b></td>'+huc+
+      '<td>'+(p.f1!=null?p.f1.toLocaleString('tr-TR'):'-')+'</td><td>'+mn(p.h0)+'</td><td>'+mn(p.h1)+'</td></tr>';
+  }).join('');
+}
+function guncelle(){ciz();tablo();}
+function toggle(ad,tar,renk,btn){
+  const u=document.getElementById('uyari'); u.style.display='none';
+  if(!tar||!arsiv[tar]){u.textContent='Arşivde bu tarih veya öncesine ait kayıt yok — o günün bültenini işlersen eklenir.';u.style.display='block';return;}
+  const i=aktif.findIndex(a=>a.tarih===tar);
+  if(i>=0){aktif.splice(i,1);if(btn){btn.classList.remove('aktif');btn.style.background='';btn.style.borderColor='';}}
+  else{aktif.push({ad:ad,tarih:tar,renk:renk});if(btn){btn.classList.add('aktif');btn.style.background=renk;btn.style.borderColor=renk;}}
+  guncelle();
+}
+document.querySelectorAll('.sec button').forEach(b=>b.addEventListener('click',
+  ()=>toggle(b.textContent,hedef(b.dataset.k),b.dataset.renk,b)));
+sel.addEventListener('change',()=>{if(sel.value)toggle('Seçilen',sel.value,'#555',null);sel.value='';});
+const ilk=document.querySelector('[data-k=onceki]');
+toggle(ilk.textContent,hedef('onceki'),ilk.dataset.renk,ilk);
+</script></body></html>

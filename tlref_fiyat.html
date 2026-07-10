@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8">
+<title>TLREF'e Endeksli Tahviller — Temiz Fiyat — 2026-07-09</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;max-width:1060px;margin:36px auto;padding:0 20px;color:#222}
+h1{font-size:22px;font-weight:600}
+.sub{color:#666;font-size:14px;margin-bottom:12px}
+.sec{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 8px;font-size:13px}
+.sec button{border:2px solid #ccc;background:#f7f7f7;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:13px}
+.sec button.aktif{color:#fff} .sec select{padding:5px;border-radius:6px;border:1px solid #ccc;font-size:13px}
+.not{color:#888;font-size:12px;margin:0 0 8px} #uyari{color:#b00;font-size:12.5px;margin:0 0 8px;display:none}
+.box{height:460px;position:relative}
+table{border-collapse:collapse;width:100%;margin-top:40px;font-size:12.5px}
+th,td{border-bottom:1px solid #e5e5e5;padding:6px 8px;text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left} th{color:#666;font-weight:600}</style></head><body>
+<h1>TLREF'e Endeksli Devlet Tahvilleri — Temiz Fiyat</h1>
+<p class="sub">TLREF'e endeksli Hazine kağıtları (TRT, resmi BIST listesi) · KESN pazarı · Grafik: T+1 valör ağırlıklı ort. temiz fiyat (T+0 sadece tabloda) · Mavi çizgi: 2026-07-09 · Gri kesikli: 100 eşiği</p>
+<div class="sec">Karşılaştır (aç/kapa):
+<button data-k="onceki" data-renk="#d63a2a">Önceki gün</button>
+<button data-k="hafta" data-renk="#2a9d4b">1 hafta önce</button>
+<button data-k="ay" data-renk="#0e8f8f">1 ay önce</button>
+<select id="tarihsec"><option value="">+ Arşivden tarih…</option></select>
+</div>
+<p id="uyari"></p>
+<p class="not">Bir düğmeye basınca o günün fiyatları kendi renginde eklenir, tekrar basınca kalkar. Hedef tarih tatilse otomatik bir önceki iş günü alınır. Tabloya da aktif günlerin fark sütunları (Δ fiyat) eklenir.</p>
+<div class="box"><canvas id="c1"></canvas></div>
+<table><thead><tr id="thr"></tr></thead><tbody id="tb"></tbody></table>
+<script>
+const BUGUN='2026-07-09', bugun=[{"x": 0.112, "y": null, "f0": 100.3, "isin": "TRT190826T19", "h0": 24362524.41, "h1": 0.0}, {"x": 0.934, "y": 101.15, "f0": null, "isin": "TRT160627T13", "h0": 0.0, "h1": 622197591.48}, {"x": 1.26, "y": 101.1, "f0": null, "isin": "TRT131027T10", "h0": 0.0, "h1": 88772457.15}, {"x": 2.162, "y": 100.15, "f0": 100.229, "isin": "TRT060928T11", "h0": 17587299.57, "h1": 4139535.95}, {"x": 2.411, "y": 100.4, "f0": null, "isin": "TRT061228T16", "h0": 25943822.88, "h1": 1037383.99}, {"x": 2.663, "y": null, "f0": 99.85, "isin": "TRT070329T15", "h0": 5153764.58, "h1": 0.0}, {"x": 2.986, "y": 99.8, "f0": 99.8, "isin": "TRT040729T14", "h0": 999095.7, "h1": 171153940.21}, {"x": 3.504, "y": 98.285, "f0": 98.287, "isin": "TRT090130T12", "h0": 341873520.76, "h1": 2756903730.35}, {"x": 3.984, "y": 97.963, "f0": 97.926, "isin": "TRT030730T12", "h0": 1023488752.68, "h1": 528142617.55}], arsiv={"2025-12-31": [{"x": 0.627, "y": 100.978, "f0": 101.197, "isin": "TRT190826T19", "h0": 106801036.28, "h1": 107827184.14}, {"x": 1.452, "y": 101.2, "f0": 101.225, "isin": "TRT160627T13", "h0": 61609828.66, "h1": 205737712.96}, {"x": 1.778, "y": 100.705, "f0": 100.796, "isin": "TRT131027T10", "h0": 41562968.01, "h1": 12046497.07}, {"x": 2.167, "y": null, "f0": 99.9, "isin": "TRT010328T12", "h0": 3086477.54, "h1": 0.0}, {"x": 2.378, "y": null, "f0": 100.0, "isin": "TRT170528T12", "h0": 1045470.66, "h1": 0.0}, {"x": 2.679, "y": 99.9, "f0": 99.889, "isin": "TRT060928T11", "h0": 421664872.11, "h1": 104368033.39}, {"x": 2.929, "y": 99.761, "f0": 99.928, "isin": "TRT061228T16", "h0": 106222410.89, "h1": 153273902.06}, {"x": 3.178, "y": 99.535, "f0": 99.513, "isin": "TRT070329T15", "h0": 1311197440.72, "h1": 285477983.84}, {"x": 3.447, "y": 99.55, "f0": 99.773, "isin": "TRT130629T30", "h0": 197389505.69, "h1": 50609428.25}, {"x": 3.504, "y": 99.628, "f0": 99.753, "isin": "TRT040729T14", "h0": 801798840.8, "h1": 335486962.64}], "2026-02-27": [{"x": 0.466, "y": 101.5, "f0": null, "isin": "TRT190826T19", "h0": 0.0, "h1": 51358071.05}, {"x": 1.29, "y": 102.3, "f0": 102.38, "isin": "TRT160627T13", "h0": 61606682.75, "h1": 176416573.69}, {"x": 2.008, "y": null, "f0": 101.5, "isin": "TRT010328T12", "h0": 3322455.61, "h1": 0.0}, {"x": 2.518, "y": 101.325, "f0": 101.362, "isin": "TRT060928T11", "h0": 472095052.25, "h1": 99076182.46}, {"x": 2.767, "y": 101.645, "f0": 101.639, "isin": "TRT061228T16", "h0": 190416550.1, "h1": 485782447.57}, {"x": 3.016, "y": 100.75, "f0": 100.774, "isin": "TRT070329T15", "h0": 248981405.6, "h1": 657057883.07}, {"x": 3.285, "y": 100.75, "f0": 100.79, "isin": "TRT130629T30", "h0": 66137316.05, "h1": 201064163.31}, {"x": 3.342, "y": 100.75, "f0": 100.8, "isin": "TRT040729T14", "h0": 10611838.19, "h1": 106388870.19}, {"x": 3.86, "y": 100.307, "f0": 100.374, "isin": "TRT090130T12", "h0": 604055060.97, "h1": 395215145.62}], "2026-06-08": [{"x": 1.019, "y": 101.505, "f0": null, "isin": "TRT160627T13", "h0": 0.0, "h1": 637194862.74}, {"x": 1.345, "y": 101.0, "f0": 101.0, "isin": "TRT131027T10", "h0": 10708377.62, "h1": 2143998.77}, {"x": 1.729, "y": 100.5, "f0": null, "isin": "TRT010328T12", "h0": 0.0, "h1": 606953233.5}, {"x": 1.94, "y": 100.45, "f0": null, "isin": "TRT170528T12", "h0": 0.0, "h1": 51330912.36}, {"x": 2.496, "y": 100.58, "f0": null, "isin": "TRT061228T16", "h0": 0.0, "h1": 141987395.42}, {"x": 2.745, "y": 100.352, "f0": null, "isin": "TRT070329T15", "h0": 332218677.93, "h1": 57563535.64}, {"x": 3.014, "y": 100.08, "f0": null, "isin": "TRT130629T30", "h0": 0.0, "h1": 550118805.12}, {"x": 3.071, "y": 100.0, "f0": 99.971, "isin": "TRT040729T14", "h0": 14105578.11, "h1": 37667552.05}, {"x": 3.589, "y": 97.252, "f0": 97.25, "isin": "TRT090130T12", "h0": 411291360.42, "h1": 2350017517.54}], "2026-06-30": [{"x": 1.882, "y": null, "f0": 101.0, "isin": "TRT170528T12", "h0": 5279424.57, "h1": 0.0}, {"x": 2.688, "y": null, "f0": 99.854, "isin": "TRT070329T15", "h0": 135749401.8, "h1": 0.0}, {"x": 2.956, "y": null, "f0": 100.0, "isin": "TRT130629T30", "h0": 5071653.01, "h1": 0.0}, {"x": 3.014, "y": null, "f0": 100.0, "isin": "TRT040729T14", "h0": 251734750.79, "h1": 0.0}, {"x": 3.529, "y": 98.586, "f0": 98.567, "isin": "TRT090130T12", "h0": 4345525598.91, "h1": 2254903865.49}], "2026-07-06": [{"x": 0.118, "y": 100.35, "f0": 100.345, "isin": "TRT190826T19", "h0": 35911746.89, "h1": 154384686.08}, {"x": 2.173, "y": null, "f0": 100.3, "isin": "TRT060928T11", "h0": 2063739.84, "h1": 0.0}, {"x": 2.668, "y": 99.8, "f0": null, "isin": "TRT070329T15", "h0": 0.0, "h1": 51399726.28}, {"x": 3.512, "y": 98.293, "f0": 98.365, "isin": "TRT090130T12", "h0": 358579129.15, "h1": 3020235105.59}], "2026-07-07": [{"x": 0.94, "y": 101.3, "f0": null, "isin": "TRT160627T13", "h0": 1035132.4, "h1": 17616290.27}, {"x": 2.17, "y": null, "f0": 100.3, "isin": "TRT060928T11", "h0": 101252863.51, "h1": 0.0}, {"x": 2.416, "y": 100.5, "f0": null, "isin": "TRT061228T16", "h0": 0.0, "h1": 2072246.23}, {"x": 2.666, "y": 99.924, "f0": 99.932, "isin": "TRT070329T15", "h0": 14410923.37, "h1": 143221112.76}, {"x": 2.934, "y": 99.8, "f0": null, "isin": "TRT130629T30", "h0": 0.0, "h1": 102125236.91}, {"x": 2.995, "y": null, "f0": 99.92, "isin": "TRT040729T14", "h0": 1069818741.82, "h1": 0.0}, {"x": 3.51, "y": 98.288, "f0": 98.22, "isin": "TRT090130T12", "h0": 1096758106.2, "h1": 1771631584.45}, {"x": 3.989, "y": 98.295, "f0": null, "isin": "TRT030730T12", "h0": 0.0, "h1": 8210597950.0}], "2026-07-08": [{"x": 0.115, "y": null, "f0": 100.3, "isin": "TRT190826T19", "h0": 31742524.58, "h1": 0.0}, {"x": 0.937, "y": 101.0, "f0": null, "isin": "TRT160627T13", "h0": 103534236.91, "h1": 103437354.72}, {"x": 1.266, "y": null, "f0": 100.8, "isin": "TRT131027T10", "h0": 1104252.04, "h1": 0.0}, {"x": 1.649, "y": null, "f0": 100.6, "isin": "TRT010328T12", "h0": 5225271.08, "h1": 0.0}, {"x": 2.414, "y": 100.354, "f0": null, "isin": "TRT061228T16", "h0": 3108369.34, "h1": 26930575.81}, {"x": 2.666, "y": null, "f0": 99.925, "isin": "TRT070329T15", "h0": 4121492.46, "h1": 0.0}, {"x": 3.507, "y": 98.183, "f0": 98.158, "isin": "TRT090130T12", "h0": 1443566955.26, "h1": 1191898753.19}, {"x": 3.986, "y": 98.236, "f0": 98.195, "isin": "TRT030730T12", "h0": 6257065100.0, "h1": 1534196185.72}]};
+const tarihler=Object.keys(arsiv).sort();
+const sel=document.getElementById('tarihsec');
+[...tarihler].reverse().forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;sel.appendChild(o);});
+
+function enYakinOnceki(hedef){let s=null;for(const t of tarihler){if(t<=hedef)s=t;else break;}return s;}
+function tarihEkle(iso,g){const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+g);return d.toISOString().slice(0,10);}
+function ayEkle(iso,a){const d=new Date(iso+'T12:00:00');d.setMonth(d.getMonth()-a);return d.toISOString().slice(0,10);}
+function hedef(k){
+  if(k==='onceki')return enYakinOnceki(tarihEkle(BUGUN,-1));
+  if(k==='hafta')return enYakinOnceki(tarihEkle(BUGUN,-7));
+  if(k==='ay')return enYakinOnceki(ayEkle(BUGUN,1));
+  return null;
+}
+const aktif=[];
+const mn=x=>x>=1e9?(x/1e9).toLocaleString('tr-TR',{maximumFractionDigits:2})+' mr':
+  (x/1e6).toLocaleString('tr-TR',{maximumFractionDigits:1})+' mn';
+const t1li=pts=>pts.filter(p=>p.y!=null);
+const OPT={responsive:true,maintainAspectRatio:false,parsing:{xAxisKey:'x',yAxisKey:'y'},
+ plugins:{legend:{labels:{usePointStyle:true,pointStyleWidth:24}},
+  tooltip:{callbacks:{title:i=>i[0].raw.isin||'100 eşiği',
+   label:i=>{const r=i.raw;if(!r.isin)return '';return i.dataset.label+' — Vade: '+r.x.toFixed(2)+' yıl, Temiz fiyat: '+r.y.toFixed(3)+', Hacim: '+mn((r.h0||0)+(r.h1||0));}}}},
+ scales:{x:{type:'linear',title:{display:true,text:'Vadeye kalan süre (yıl)'},min:0},
+  y:{title:{display:true,text:'Temiz fiyat'}}}};
+let grafik=null;
+function ciz(){
+  const d=[{label:BUGUN,data:t1li(bugun),borderColor:'#2a78d6',backgroundColor:'#2a78d6',
+    borderWidth:2.5,pointRadius:4,tension:0.35,fill:false}];
+  aktif.forEach(a=>d.push({label:a.ad+' ('+a.tarih+')',data:t1li(arsiv[a.tarih]),
+    borderColor:a.renk,backgroundColor:a.renk,borderWidth:2,pointRadius:3,tension:0.35,fill:false}));
+  let xmax=0;d.forEach(s=>s.data.forEach(p=>{if(p.x>xmax)xmax=p.x;}));
+  d.push({label:'100 eşiği',data:[{x:0,y:100},{x:xmax+0.2,y:100}],
+    borderColor:'#999',backgroundColor:'#999',borderWidth:1.5,borderDash:[6,4],pointRadius:0,fill:false});
+  if(grafik)grafik.destroy();
+  grafik=new Chart(document.getElementById('c1'),{type:'line',data:{datasets:d},options:OPT});
+}
+function tablo(){
+  document.getElementById('thr').innerHTML='<th>ISIN</th><th>Vade (yıl)</th><th>T+1 fiyat '+BUGUN+'</th>'+
+    aktif.map(a=>'<th>'+a.ad+'<br>'+a.tarih+' (Δ)</th>').join('')+
+    '<th>T+0 ort. fiyat</th><th>Hacim T+0 (TL)</th><th>Hacim T+1 (TL)</th>';
+  const maps=aktif.map(a=>{const m={};arsiv[a.tarih].forEach(p=>m[p.isin]=p);return m;});
+  document.getElementById('tb').innerHTML=bugun.map(p=>{
+    const huc=maps.map(m=>{const o=m[p.isin];if(!o||o.y==null||p.y==null)return '<td>-</td>';
+      const f=p.y-o.y;
+      return '<td>'+o.y.toFixed(3)+' ('+(f>=0?'+':'−')+Math.abs(f).toFixed(3)+')</td>';}).join('');
+    return '<tr><td>'+p.isin+'</td><td>'+p.x.toFixed(2)+'</td>'+
+      '<td><b>'+(p.y!=null?p.y.toFixed(3):'-')+'</b></td>'+huc+
+      '<td>'+(p.f0!=null?p.f0.toFixed(3):'-')+'</td><td>'+mn(p.h0)+'</td><td>'+mn(p.h1)+'</td></tr>';
+  }).join('');
+}
+function guncelle(){ciz();tablo();}
+function toggle(ad,tar,renk,btn){
+  const u=document.getElementById('uyari'); u.style.display='none';
+  if(!tar||!arsiv[tar]){u.textContent='Arşivde bu tarih veya öncesine ait kayıt yok — o günün bültenini işlersen eklenir.';u.style.display='block';return;}
+  const i=aktif.findIndex(a=>a.tarih===tar);
+  if(i>=0){aktif.splice(i,1);if(btn){btn.classList.remove('aktif');btn.style.background='';btn.style.borderColor='';}}
+  else{aktif.push({ad:ad,tarih:tar,renk:renk});if(btn){btn.classList.add('aktif');btn.style.background=renk;btn.style.borderColor=renk;}}
+  guncelle();
+}
+document.querySelectorAll('.sec button').forEach(b=>b.addEventListener('click',
+  ()=>toggle(b.textContent,hedef(b.dataset.k),b.dataset.renk,b)));
+sel.addEventListener('change',()=>{if(sel.value)toggle('Seçilen',sel.value,'#555',null);sel.value='';});
+const ilk=document.querySelector('[data-k=onceki]');
+toggle(ilk.textContent,hedef('onceki'),ilk.dataset.renk,ilk);
+</script></body></html>
