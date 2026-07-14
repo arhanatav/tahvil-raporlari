@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="tr"><head><meta charset="utf-8">
-<title>Altına Dayalı Hazine Kağıtları — Fiyat — 2026-07-10</title>
+<title>Altına Dayalı Hazine Kağıtları — Fiyat — 2026-07-14</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;max-width:1060px;margin:36px auto;padding:0 20px;color:#222}
 h1{font-size:22px;font-weight:600}
@@ -14,8 +14,8 @@ table{border-collapse:collapse;width:100%;margin-top:40px;font-size:12.5px}
 th,td{border-bottom:1px solid #e5e5e5;padding:6px 8px;text-align:right;white-space:nowrap}
 th:first-child,td:first-child{text-align:left} th{color:#666;font-weight:600}</style></head><body>
 <h1>Altına Dayalı Hazine Kağıtları — Fiyat</h1>
-<p class="sub">Altın tahvili + altına dayalı kira sertifikası (Hazine, resmi BIST listesi) · KESN pazarı · Grafik: T+0 valör ağırlıklı ort. fiyat, TL (bu kağıtlar neredeyse yalnız T+0 işlem görür; T+1 tabloda) · Mavi çizgi: 2026-07-10</p>
-<p class="ozelnot">2026-07-13 bülteninde altın kağıdında işlem yok — en son işlem görülen gün (2026-07-10) gösteriliyor.</p>
+<p class="sub">Altın tahvili + altına dayalı kira sertifikası (Hazine, resmi BIST listesi) · KESN pazarı · Grafik: T+0 valör ağırlıklı ort. fiyat, TL (bu kağıtlar neredeyse yalnız T+0 işlem görür; T+1 tabloda) · Mavi çizgi: 2026-07-14</p>
+
 <div class="sec">Karşılaştır (aç/kapa):
 <button data-k="onceki" data-renk="#d63a2a">Önceki gün</button>
 <button data-k="hafta" data-renk="#2a9d4b">1 hafta önce</button>
@@ -27,7 +27,7 @@ th:first-child,td:first-child{text-align:left} th{color:#666;font-weight:600}</s
 <div class="box"><canvas id="c1"></canvas></div>
 <table><thead><tr id="thr"></tr></thead><tbody id="tb"></tbody></table>
 <script>
-const BUGUN='2026-07-10', bugun=[{"x": 0.244, "y": 6390.0, "f1": null, "isin": "TRD071026T17", "tur": "Kira Sert.", "h0": 127161000.0, "h1": 0.0}, {"x": 1.107, "y": 6228.0, "f1": null, "isin": "TRD180827T17", "tur": "Kira Sert.", "h0": 12393720.0, "h1": 0.0}, {"x": 1.356, "y": 6216.0, "f1": null, "isin": "TRD171127T39", "tur": "Kira Sert.", "h0": 12369840.0, "h1": 0.0}], arsiv={"2025-12-31": [{"x": 0.767, "y": 6617.96, "f1": null, "isin": "TRD071026T17", "tur": "Kira Sert.", "h0": 4839879000.0, "h1": 0.0}, {"x": 0.767, "y": 6221.0, "f1": null, "isin": "TRT071026T19", "tur": "Tahvil", "h0": 618989500.0, "h1": 0.0}], "2026-06-30": [{"x": 1.384, "y": 6116.78, "f1": null, "isin": "TRD171127T39", "tur": "Kira Sert.", "h0": 54775745.0, "h1": 0.0}], "2026-07-07": [{"x": 1.115, "y": 6253.0, "f1": null, "isin": "TRD180827T17", "tur": "Kira Sert.", "h0": 31108675.0, "h1": 0.0}, {"x": 1.69, "y": 6280.0, "f1": null, "isin": "TRD150328T14", "tur": "Kira Sert.", "h0": 6248600000.0, "h1": 0.0}], "2026-07-09": [{"x": 0.553, "y": 6217.5, "f1": null, "isin": "TRD270127T13", "tur": "Kira Sert.", "h0": 742369500.0, "h1": 0.0}]};
+const BUGUN='2026-07-14', bugun=[{"x": 0.233, "y": 6277.97, "f1": null, "isin": "TRD071026T17", "tur": "Kira Sert.", "h0": 399781050.0, "h1": 0.0}, {"x": 0.54, "y": 6100.25, "f1": null, "isin": "TRD270127T13", "tur": "Kira Sert.", "h0": 24278995.0, "h1": 0.0}, {"x": 1.096, "y": 6093.5, "f1": null, "isin": "TRD180827T17", "tur": "Kira Sert.", "h0": 24252130.0, "h1": 0.0}, {"x": 1.671, "y": 6093.5, "f1": null, "isin": "TRD150328T14", "tur": "Kira Sert.", "h0": 24252130.0, "h1": 0.0}, {"x": 1.748, "y": 6091.25, "f1": null, "isin": "TRD120428T32", "tur": "Kira Sert.", "h0": 24243175.0, "h1": 0.0}], arsiv={"2025-12-31": [{"x": 0.767, "y": 6617.96, "f1": null, "isin": "TRD071026T17", "tur": "Kira Sert.", "h0": 4839879000.0, "h1": 0.0}, {"x": 0.767, "y": 6221.0, "f1": null, "isin": "TRT071026T19", "tur": "Tahvil", "h0": 618989500.0, "h1": 0.0}], "2026-06-30": [{"x": 1.384, "y": 6116.78, "f1": null, "isin": "TRD171127T39", "tur": "Kira Sert.", "h0": 54775745.0, "h1": 0.0}], "2026-07-07": [{"x": 1.115, "y": 6253.0, "f1": null, "isin": "TRD180827T17", "tur": "Kira Sert.", "h0": 31108675.0, "h1": 0.0}, {"x": 1.69, "y": 6280.0, "f1": null, "isin": "TRD150328T14", "tur": "Kira Sert.", "h0": 6248600000.0, "h1": 0.0}], "2026-07-09": [{"x": 0.553, "y": 6217.5, "f1": null, "isin": "TRD270127T13", "tur": "Kira Sert.", "h0": 742369500.0, "h1": 0.0}], "2026-07-10": [{"x": 0.244, "y": 6390.0, "f1": null, "isin": "TRD071026T17", "tur": "Kira Sert.", "h0": 127161000.0, "h1": 0.0}, {"x": 1.107, "y": 6228.0, "f1": null, "isin": "TRD180827T17", "tur": "Kira Sert.", "h0": 12393720.0, "h1": 0.0}, {"x": 1.356, "y": 6216.0, "f1": null, "isin": "TRD171127T39", "tur": "Kira Sert.", "h0": 12369840.0, "h1": 0.0}]};
 const tarihler=Object.keys(arsiv).sort();
 const sel=document.getElementById('tarihsec');
 [...tarihler].reverse().forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;sel.appendChild(o);});
