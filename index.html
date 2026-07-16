@@ -10,6 +10,7 @@
   #sekmeler { display: flex; gap: 6px; padding: 10px 12px; background: #f2f2f2; border-bottom: 1px solid #ddd; }
   .sekme { flex: 1; padding: 12px 8px; border: none; border-radius: 8px; background: #fff; color: #111; font-size: 0.95em; cursor: pointer; }
   .sekme.aktif { background: #111; color: #fff; }
+  a.sekme { display: flex; align-items: center; justify-content: center; text-decoration: none; background: #1a7a3a; color: #fff; }
   iframe { flex: 1; width: 100%; border: none; }
 </style>
 </head>
@@ -19,6 +20,7 @@
   <button class="sekme" data-src="tlref_fiyat.html">TLREF raporu</button>
   <button class="sekme" data-src="altin_fiyat.html">Altın raporu</button>
   <button class="sekme" data-src="tufe_reel.html">TÜFE raporu</button>
+  <a class="sekme" href="fon_getirileri.xlsx" download="Fon Getirileri.xlsx">Fon Getirileri (Excel) ⬇</a>
 </div>
 <iframe id="rapor" src="verim_egrisi.html"></iframe>
 <script>
